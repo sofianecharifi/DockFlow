@@ -1,1 +1,5 @@
+.env
+node_modules
 help.md
+package-lock.json
+package.json
