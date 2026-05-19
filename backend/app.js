@@ -1,7 +1,5 @@
 const express = require("express");
-const Dockerode = require("dockerode");
 
-const docker = new Dockerode();
 const app = express();
 const port = 3000;
 
@@ -25,5 +23,5 @@ app.get("/api/images", (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+    console.log(`Example app listening on port localhost:${port}`);
 });
