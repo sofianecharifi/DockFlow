@@ -1,0 +1,1 @@
+// Logique pour ouvrir/fermer la fenêtre des logs

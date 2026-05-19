@@ -1,0 +1,1 @@
+// Logique pour créer la carte visuelle d'une application

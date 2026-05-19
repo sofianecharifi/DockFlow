@@ -1,0 +1,1 @@
+// Appels fetch pour lister, démarrer, stopper les apps
