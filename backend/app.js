@@ -1,3 +1,4 @@
+const listContainers = require("./src/modules/containers/containers.controller");
 const express = require("express");
 const path = require("path");
 
@@ -10,19 +11,16 @@ app.get("/", (req, res) => {
 
 app.use(express.static(path.join(__dirname, "../frontend"), { index: false }));
 
-app.get("/api/images", (req, res) => {
-    docker.listImages({ all: true }, (err, images) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send("Error listing images");
-        } else {
-            const mappedImages = images.map((image) => ({
-                id: image.Id,
-                names: image.RepoTags,
-            }));
-            res.json(mappedImages);
-        }
-    });
+app.get("/api/containers", async (req, res) => {
+    try {
+        const containers = await listContainers();
+        res.json(containers);
+
+    } catch (error) {
+        res.status(500).json({
+            error: "Erreur serveur"
+        });
+    }
 });
 
 app.listen(port, '0.0.0.0', () => {
