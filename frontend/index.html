@@ -1,16 +1,14 @@
-<!-- tableau de bord principal (dashboard) après la connexion  -->
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DockFlow - Tableau de bord</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-
 <body class="bg-[#0f172a] text-white font-sans antialiased min-h-screen flex flex-col">
 
+    <!-- Étape 1 : Le Layout Global - La barre de navigation -->
     <header class="bg-[#1e293b] border-b border-slate-700 sticky top-0 z-50 shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -23,8 +21,8 @@
                     <span class="font-bold text-xl tracking-tight text-[#dbeafe]">DockFlow</span>
                 </div>
                 <div class="flex items-center gap-4">
-                    <span class="text-sm text-slate-400 hidden sm:block">Serveur Hôte : En ligne</span>
-                    <button class="text-sm font-medium text-slate-300 hover:text-white px-3 py-2 rounded-md hover:bg-slate-800 transition-colors">
+                    <span id="user-name" class="text-sm text-slate-400 hidden sm:block">Utilisateur connecté</span>
+                    <button id="logout-btn" class="text-sm font-medium text-slate-300 hover:text-white px-3 py-2 rounded-md hover:bg-slate-800 transition-colors">
                         Déconnexion
                     </button>
                 </div>
@@ -32,124 +30,80 @@
         </div>
     </header>
 
+    <!-- Étape 1 : La zone principale -->
     <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-slide-up">
 
+        <!-- Étape 2 : La Section Monitoring -->
         <section>
             <h2 class="text-lg font-semibold text-white mb-4">Ressources du Serveur</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-[#1e293b] border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col justify-center">
                     <div class="flex justify-between items-end mb-2">
                         <span class="text-sm font-medium text-slate-400">Processeur (CPU)</span>
-                        <span class="text-lg font-bold text-white">45%</span>
+                        <span id="cpu-text" class="text-lg font-bold text-white">Calcule...</span>
                     </div>
                     <div class="w-full bg-slate-800 rounded-full h-2.5">
-                        <div class="bg-blue-500 h-2.5 rounded-full" style="width: 45%"></div>
+                        <div id="cpu-gauge" class="bg-blue-500 h-2.5 rounded-full" style="width: 0%"></div>
                     </div>
                 </div>
                 <div class="bg-[#1e293b] border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col justify-center">
                     <div class="flex justify-between items-end mb-2">
                         <span class="text-sm font-medium text-slate-400">Mémoire (RAM)</span>
-                        <span class="text-lg font-bold text-white">70%</span>
+                        <span id="ram-text" class="text-lg font-bold text-white">Calcule...</span>
                     </div>
                     <div class="w-full bg-slate-800 rounded-full h-2.5">
-                        <div class="bg-amber-500 h-2.5 rounded-full" style="width: 70%"></div>
+                        <div id="ram-gauge" class="bg-amber-500 h-2.5 rounded-full" style="width: 0%"></div>
                     </div>
                 </div>
                 <div class="bg-[#1e293b] border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col justify-center">
                     <div class="flex justify-between items-end mb-2">
                         <span class="text-sm font-medium text-slate-400">Stockage</span>
-                        <span class="text-lg font-bold text-white">28%</span>
+                        <span id="disk-text" class="text-lg font-bold text-white">Calcule...</span>
                     </div>
                     <div class="w-full bg-slate-800 rounded-full h-2.5">
-                        <div class="bg-emerald-500 h-2.5 rounded-full" style="width: 28%"></div>
+                        <div id="disk-gauge" class="bg-emerald-500 h-2.5 rounded-full" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- Étape 3 : La Section Applications -->
         <section>
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-white">Mes Applications</h2>
+                <h2 class="text-xl font-bold text-white">Vos Applications</h2>
                 <button class="bg-[#dbeafe] text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-white hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
                     + Nouvelle App
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                <div class="bg-[#1e293b] border border-slate-700 rounded-2xl shadow-xl overflow-hidden flex flex-col transition-all hover:border-slate-500">
-                    <div class="p-5 flex-grow">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                    Site Vitrine (WordPress)
-                                </h3>
-                                <p class="text-sm text-slate-400 mt-1">v6.4.3</p>
-                            </div>
-                            <span class="flex h-3 w-3 relative">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                            </span>
-                        </div>
-                        <p class="text-sm text-emerald-400 font-medium">Actif (En ligne depuis 4 jours)</p>
-                    </div>
-                    
-                    <div class="bg-slate-800/50 p-4 border-t border-slate-700 grid grid-cols-2 gap-2">
-                        <button class="col-span-1 bg-slate-700 hover:bg-slate-600 text-white text-xs font-medium py-2 px-3 rounded-lg flex justify-center items-center gap-1 transition-colors">
-                            <span>⏸️ Pause</span>
-                        </button>
-                        <button class="col-span-1 bg-slate-700 hover:bg-slate-600 text-white text-xs font-medium py-2 px-3 rounded-lg flex justify-center items-center gap-1 transition-colors">
-                            <span>🔄 Redémarrer</span>
-                        </button>
-                        <button class="col-span-1 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 text-xs font-medium py-2 px-3 rounded-lg flex justify-center items-center gap-1 transition-colors">
-                            <span>⬆️ Mettre à jour</span>
-                        </button>
-                        <button class="col-span-1 bg-slate-700 hover:bg-slate-600 text-white text-xs font-medium py-2 px-3 rounded-lg flex justify-center items-center gap-1 transition-colors">
-                            <span>📋 Logs</span>
-                        </button>
-                        <button class="col-span-2 mt-1 text-red-400 hover:text-red-300 text-xs font-medium py-2 flex justify-center items-center gap-1 transition-colors">
-                            🗑️ Supprimer l'application
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-[#1e293b] border border-slate-700 rounded-2xl shadow-xl overflow-hidden flex flex-col transition-all hover:border-slate-500">
-                    <div class="p-5 flex-grow">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                    Serveur Minecraft
-                                </h3>
-                                <p class="text-sm text-slate-400 mt-1">v1.20.4</p>
-                            </div>
-                            <span class="flex h-3 w-3 relative">
-                                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                            </span>
-                        </div>
-                        <p class="text-sm text-red-400 font-medium">Stoppé</p>
-                    </div>
-                    
-                    <div class="bg-slate-800/50 p-4 border-t border-slate-700 grid grid-cols-2 gap-2">
-                        <button class="col-span-2 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 text-xs font-medium py-2 px-3 rounded-lg flex justify-center items-center gap-1 transition-colors">
-                            <span>▶️ Démarrer</span>
-                        </button>
-                        <button class="col-span-1 bg-slate-700 hover:bg-slate-600 text-slate-400 cursor-not-allowed text-xs font-medium py-2 px-3 rounded-lg flex justify-center items-center gap-1 transition-colors" disabled>
-                            <span>⬆️ Mettre à jour</span>
-                        </button>
-                        <button class="col-span-1 bg-slate-700 hover:bg-slate-600 text-white text-xs font-medium py-2 px-3 rounded-lg flex justify-center items-center gap-1 transition-colors">
-                            <span>📋 Logs</span>
-                        </button>
-                        <button class="col-span-2 mt-1 text-red-400 hover:text-red-300 text-xs font-medium py-2 flex justify-center items-center gap-1 transition-colors">
-                            🗑️ Supprimer l'application
-                        </button>
-                    </div>
-                </div>
-
+            <!-- Grille vide qui sera remplie par le JavaScript -->
+            <div id="containers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Les cartes arriveront ici -->
             </div>
         </section>
 
     </main>
 
-</body>
+    <!-- Étape 4 : La Fenêtre Modale pour les Logs -->
+    <div id="logs-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <!-- Backdrop semi-transparent -->
+        <div id="logs-backdrop" class="absolute inset-0 bg-black/70 backdrop-blur-sm cursor-pointer"></div>
+        
+        <!-- Boîte de terminal -->
+        <div class="relative w-full max-w-4xl bg-black rounded-lg shadow-2xl border border-slate-700 overflow-hidden flex flex-col h-[70vh]">
+            <div class="bg-slate-800 px-4 py-3 border-b border-slate-700 flex justify-between items-center">
+                <span class="text-slate-300 font-mono text-sm">Terminal - Logs</span>
+                <button id="close-logs-btn" class="text-slate-400 hover:text-white transition-colors">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="p-4 flex-grow overflow-y-auto">
+                <pre id="logs-stream" class="text-green-400 font-mono text-xs sm:text-sm whitespace-pre-wrap break-all">Calcule...</pre>
+            </div>
+        </div>
+    </div>
 
+    <!-- Étape 5 : Le Branchement du Script de Page -->
+    <script src="./js/pages/dashboard.page.js" type="module"></script>
+</body>
 </html>

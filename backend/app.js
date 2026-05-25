@@ -1,8 +1,18 @@
-const listContainers = require("./src/modules/containers/containers.controller");
+require("dotenv").config();
+const containersRoutes = require("./src/modules/containers/containers.routes");
+const authRoutes = require("./src/modules/auth/auth.routes");
+const docker = require("./src/config/docker");
 const express = require("express");
 const path = require("path");
 
 const app = express();
+const port = process.env.PORT || 3000;
+
+// Middleware pour parser le JSON du body
+app.use(express.json());
+
+// Routes d'authentification
+app.use('/api/auth', authRoutes);
 
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend/login.html"));
@@ -10,23 +20,24 @@ app.get("/", (req, res) => {
 
 app.use(express.static(path.join(__dirname, "../frontend"), { index: false }));
 
-<<<<<<< HEAD
 app.get("/api/images", (req, res) => {
-    
-=======
-app.get("/api/containers", async (req, res) => {
-    try {
-        const containers = await listContainers();
-        res.json(containers);
-
-    } catch (error) {
-        res.status(500).json({
-            error: "Erreur serveur"
-        });
-    }
->>>>>>> faa1f350755457d5ad86e997f8eea9dda397f8c9
+    docker.listImages({ all: true }, (err, images) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Error listing images");
+        } else {
+            const mappedImages = images.map((image) => ({
+                id: image.Id,
+                names: image.RepoTags,
+            }));
+            res.json(mappedImages);
+        }
+    });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+// Routes pour les conteneurs (protégées par requireAuth)
+app.use('/api/containers', containersRoutes);
+
+app.listen(port, '0.0.0.0', () => {
     console.log(`Example app listening on port http://localhost:${port}`);
 });
