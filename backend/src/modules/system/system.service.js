@@ -1,23 +1,38 @@
-const osu = require('node-os-utils');
-const cpu = osu.cpu;
-const mem = osu.mem;
-const drive = osu.drive;
+const { createOSUtils } = require('node-os-utils');
+const osUtils = createOSUtils();
 
 async function getSystemStats() {
     try {
-        // Collecte des données
-        const cpuPercentage = await cpu.usage();
-        const memInfo = await mem.info();
-        // drive.info() retourne généralement les infos du disque principal ('/')
-        const driveInfo = await drive.info();
+        // Collecte des données avec la nouvelle API
+        const cpuResult = await osUtils.cpu.usage();
+        const memResult = await osUtils.memory.info();
+        const diskResult = await osUtils.disk.info();
+
+        let cpuPercentage = 0;
+        let ramPercentage = 0;
+        let diskPercentage = 0;
+
+        if (cpuResult.success) {
+            cpuPercentage = cpuResult.data;
+        }
+
+        if (memResult.success && memResult.data) {
+            ramPercentage = memResult.data.usagePercentage || 0;
+        }
+
+        if (diskResult.success && Array.isArray(diskResult.data)) {
+            // Trouver le disque principal ('/') ou prendre le premier
+            const mainDisk = diskResult.data.find(d => d.mountpoint === '/') || diskResult.data[0];
+            if (mainDisk) {
+                diskPercentage = mainDisk.usagePercentage || 0;
+            }
+        }
 
         // Formatage pour correspondre au frontend
         return {
             cpu: Math.round(cpuPercentage),
-            // mem.info() donne `usedMemPercentage` et `freeMemPercentage`
-            ram: Math.round(memInfo.usedMemPercentage || (100 - memInfo.freeMemPercentage) || 0),
-            // drive.info() donne `usedPercentage`
-            disk: Math.round(driveInfo.usedPercentage || 0)
+            ram: Math.round(ramPercentage),
+            disk: Math.round(diskPercentage)
         };
     } catch (error) {
         console.error("Erreur lors de la récupération des statistiques système :", error);
