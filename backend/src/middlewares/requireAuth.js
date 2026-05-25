@@ -1,26 +1,26 @@
 const jwt = require('jsonwebtoken');
 
 const requireAuth = (req, res, next) => {
-    // La fouille : récupération de l'en-tête Authorization
+    // Récupération de l'en-tête Authorization
     const authHeader = req.headers.authorization;
 
-    // Le contrôle : token absent ou mal formaté
+    // Vérification de la présence et du format du token
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ message: 'Non Autorisé' });
     }
 
-    // Découpage pour récupérer uniquement le token pur (après "Bearer ")
+    // Extraction du token de l'en-tête
     const token = authHeader.split(' ')[1];
 
     try {
         // Vérification du token avec la clé secrète
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         
-        // Si succès : le feu vert pour continuer vers la route
+        // Autorisation accordée, passage au middleware suivant
         req.user = decoded; // On stocke l'ID utilisateur au cas où
         next();
     } catch (error) {
-        // Si le token est trafiqué ou expiré
+        // Gestion des tokens invalides ou expirés
         return res.status(401).json({ message: 'Non Autorisé' });
     }
 };

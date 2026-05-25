@@ -17,15 +17,28 @@ const io = new Server(server);
 
 // Gestion des connexions WebSocket
 io.on('connection', (socket) => {
-    // Envoi périodique des statistiques système (toutes les 2 secondes)
-    const statsInterval = setInterval(async () => {
-        const stats = await getSystemStats();
-        // Émission des données vers le frontend
-        socket.emit('system-stats', stats);
-    }, 2000);
+    // Envoi périodique des statistiques système
+    let isConnected = true;
+
+    const sendStats = async () => {
+        if (!isConnected) return;
+
+        try {
+            const stats = await getSystemStats();
+            socket.emit('system-stats', stats);
+        } catch (err) {
+            console.error("Erreur stats:", err);
+        }
+
+        // On attend 1 seconde avant de relancer pour éviter de surcharger l'Event Loop
+        // tout en gardant une interface fluide et réactive.
+        setTimeout(sendStats, 1000);
+    };
+
+    sendStats();
 
     socket.on('disconnect', () => {
-        clearInterval(statsInterval);
+        isConnected = false;
     });
 });
 

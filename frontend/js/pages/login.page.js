@@ -1,6 +1,6 @@
 import { loginRequest } from '../api/auth.api.js';
 
-// Le ciblage
+// Sélection des éléments du DOM
 const form = document.querySelector('form');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
@@ -14,16 +14,16 @@ if (!errorDiv) {
     form.prepend(errorDiv);
 }
 
-// L'interception
+// Gestionnaire de l'événement de soumission du formulaire
 form.addEventListener('submit', async (e) => {
-    // Le blocage : empêcher la page de se recharger
+    // Empêcher le rechargement de la page
     e.preventDefault();
     
     // On cache le message d'erreur lors d'une nouvelle tentative
     errorDiv.classList.add('hidden');
     errorDiv.textContent = '';
 
-    // L'action : on récupère les valeurs
+    // Récupération des valeurs du formulaire
     const email = emailInput.value;
     const password = passwordInput.value;
 
@@ -31,14 +31,14 @@ form.addEventListener('submit', async (e) => {
         // On appelle l'API d'authentification
         const data = await loginRequest(email, password);
         
-        // Le stockage : on met le token bien au chaud
+        // Stockage du jeton d'authentification dans le localStorage
         localStorage.setItem('dockflow_token', data.token);
         
-        // La redirection : direction la page principale
+        // Redirection vers le tableau de bord
         window.location.href = '/index.html';
         
     } catch (error) {
-        // En cas d'échec : on affiche le message rouge
+        // Gestion des erreurs d'authentification et affichage du message
         console.error('Erreur lors de la connexion :', error);
         errorDiv.textContent = error.message || 'Erreur de connexion. Vérifiez vos identifiants.';
         errorDiv.classList.remove('hidden');
