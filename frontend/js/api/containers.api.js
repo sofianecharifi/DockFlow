@@ -1,8 +1,8 @@
 export async function getContainers() {
-    // Étape 1 : La fouille (récupération du token)
+    // Récupération du jeton d'authentification
     const token = localStorage.getItem('dockflow_token');
 
-    // Étape 2 : L'appel sécurisé au serveur
+    // Exécution de la requête API
     const response = await fetch('/api/containers', {
         method: 'GET', // (optionnel car GET est la méthode par défaut, mais c'est bien de le préciser)
         headers: {
@@ -10,7 +10,7 @@ export async function getContainers() {
         }
     });
 
-    // Étape 3 : Le traitement de la réponse (Gestion des erreurs)
+    // Gestion de la réponse et des erreurs
     if (!response.ok) {
         // Si le token est invalide, expiré, ou absent
         if (response.status === 401) {
@@ -28,10 +28,10 @@ export async function getContainers() {
 export async function actionContainer(id, action) {
     const token = localStorage.getItem('dockflow_token');
     
-    // Détermination de la méthode (DELETE pour la suppression, POST pour les autres)
+    // Détermination de la méthode HTTP selon l'action
     const method = action === 'remove' ? 'DELETE' : 'POST';
     
-    // Construction dynamique de l'URL (notre route DELETE est sur /:id, les autres sur /:id/:action)
+    // Construction dynamique de l'URL de l'API
     const url = action === 'remove' ? `/api/containers/${id}` : `/api/containers/${id}/${action}`;
 
     const response = await fetch(url, {

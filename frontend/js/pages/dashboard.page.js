@@ -1,16 +1,12 @@
-// ==========================================
-// ÉTAPE 1 : La barrière de sécurité (Le Gardien)
-// ==========================================
+// Vérification de l'authentification de l'utilisateur
 const token = localStorage.getItem('dockflow_token');
 
-// Le verdict : si pas de token, on dégage vers le login !
+// Redirection vers la page de connexion si le token est manquant
 if (!token) {
     window.location.href = '/login.html';
 }
 
-// ==========================================
-// ÉTAPE 2 : La logique de déconnexion (Logout)
-// ==========================================
+// Gestion de la déconnexion
 const logoutBtn = document.getElementById('logout-btn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
@@ -21,30 +17,26 @@ if (logoutBtn) {
     });
 }
 
-// ==========================================
-// ÉTAPE 4 : La logique de rendu de la grille
-// ==========================================
+// Fonctionnalités de rendu de la liste des conteneurs
 import { createContainerCard } from '../components/card.js';
 
 function renderContainersGrid(containers) {
-    // Le ciblage
+    // Récupération du conteneur de la grille
     const grid = document.getElementById('containers-grid');
     if (!grid) return;
 
-    // Le nettoyage : on vide la grille (méthode sécurisée sans innerHTML)
+    // Nettoyage de la grille avant injection
     grid.replaceChildren();
 
-    // La boucle : on affiche chaque conteneur
+    // Itération sur les conteneurs pour les afficher
     containers.forEach(container => {
-        // Création de l'élément DOM sécurisé via notre usine à cartes
+        // Création de l'élément carte du conteneur
         const cardElement = createContainerCard(container);
         grid.appendChild(cardElement);
     });
 }
 
-// ==========================================
-// ÉTAPE 5 : L'écoute du temps réel (WebSockets)
-// ==========================================
+// Initialisation de la connexion WebSockets
 function initWebSockets() {
     // Vérifie si Socket.io est bien chargé dans le HTML
     if (typeof io !== 'undefined') {
@@ -81,18 +73,14 @@ function initWebSockets() {
     }
 }
 
-// ==========================================
-// ÉTAPE 3 : L'orchestration du chargement initial
-// ==========================================
+// Importation des services API
 import { getContainers, actionContainer } from '../api/containers.api.js';
 
-// ==========================================
-// ÉTAPE 6 : L'orchestration des actions (Délégation)
-// ==========================================
+// Gestion des événements d'action sur les conteneurs
 const gridContainer = document.getElementById('containers-grid');
 if (gridContainer) {
     gridContainer.addEventListener('click', async (event) => {
-        // Le filtrage : on cherche si le clic provient d'un bouton avec data-action
+        // Vérification du bouton cliqué
         const button = event.target.closest('button[data-action]');
         if (!button) return;
 
@@ -108,7 +96,7 @@ if (gridContainer) {
         }
 
         try {
-            // L'exécution : on appelle l'API
+            // Appel à l'API pour exécuter l'action
             button.disabled = true;
             await actionContainer(id, action);
             
@@ -138,5 +126,5 @@ async function initializeDashboard() {
     }
 }
 
-// Lancement direct puisque le Gardien (Étape 1) a validé le token !
+// Initialisation du tableau de bord au chargement de la page
 initializeDashboard();

@@ -11,20 +11,19 @@ const path = require("path");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ÉTAPE 3 : La Métamorphose - Création du serveur HTTP et initialisation de Socket.io
+// Création du serveur HTTP et initialisation de Socket.io
 const server = http.createServer(app);
 const io = new Server(server);
 
-// L'écoute des connexions
+// Gestion des connexions WebSocket
 io.on('connection', (socket) => {
-    // La boucle d'envoi (toutes les 2 secondes)
+    // Envoi périodique des statistiques système (toutes les 2 secondes)
     const statsInterval = setInterval(async () => {
         const stats = await getSystemStats();
-        // L'émission des données vers le frontend
+        // Émission des données vers le frontend
         socket.emit('system-stats', stats);
     }, 2000);
 
-    // Le piège mortel : on coupe la boucle quand le client quitte la page
     socket.on('disconnect', () => {
         clearInterval(statsInterval);
     });
@@ -60,7 +59,7 @@ app.get("/api/images", (req, res) => {
 // Routes pour les conteneurs (protégées par requireAuth)
 app.use('/api/containers', containersRoutes);
 
-// Le lancement final : on utilise server au lieu de app !
+// Lancement du serveur sur le port spécifié
 server.listen(port, '0.0.0.0', () => {
     console.log(`Example app listening on port http://localhost:${port}`);
 });
