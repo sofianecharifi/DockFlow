@@ -24,7 +24,7 @@ if (logoutBtn) {
 // ==========================================
 // ÉTAPE 4 : La logique de rendu de la grille
 // ==========================================
-// import { createContainerCard } from '../components/card.js'; // (Bientôt !)
+import { createContainerCard } from '../components/card.js';
 
 function renderContainersGrid(containers) {
     // Le ciblage
@@ -36,12 +36,9 @@ function renderContainersGrid(containers) {
 
     // La boucle : on affiche chaque conteneur
     containers.forEach(container => {
-        // En attendant d'avoir card.js, on met un bloc temporaire
-        // Plus tard, on créera le DOM via createElement dans card.js pour éviter les failles XSS
-        const placeholder = document.createElement('div');
-        placeholder.className = "bg-slate-800 p-4 rounded-xl text-center text-slate-300 border border-slate-700";
-        placeholder.textContent = `⏳ En attente du composant Card pour : ${container.name || container.Names[0]}`;
-        grid.appendChild(placeholder);
+        // Création de l'élément DOM sécurisé via notre usine à cartes
+        const cardElement = createContainerCard(container);
+        grid.appendChild(cardElement);
     });
 }
 
@@ -87,21 +84,54 @@ function initWebSockets() {
 // ==========================================
 // ÉTAPE 3 : L'orchestration du chargement initial
 // ==========================================
-// import { fetchContainers } from '../api/containers.api.js'; // (Bientôt !)
+import { getContainers, actionContainer } from '../api/containers.api.js';
+
+// ==========================================
+// ÉTAPE 6 : L'orchestration des actions (Délégation)
+// ==========================================
+const gridContainer = document.getElementById('containers-grid');
+if (gridContainer) {
+    gridContainer.addEventListener('click', async (event) => {
+        // Le filtrage : on cherche si le clic provient d'un bouton avec data-action
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+
+        const action = button.dataset.action;
+        const id = button.dataset.id;
+
+        if (!action || !id) return;
+
+        // On ignore le bouton logs pour le moment
+        if (action === 'logs') {
+            console.log("Ouverture des logs pour le conteneur", id);
+            return;
+        }
+
+        try {
+            // L'exécution : on appelle l'API
+            button.disabled = true;
+            await actionContainer(id, action);
+            
+            // Rafraîchissement global de la page
+            await initializeDashboard();
+        } catch (error) {
+            console.error(`Erreur lors de l'action ${action}:`, error);
+            alert(error.message);
+            button.disabled = false;
+        }
+    });
+}
 
 async function initializeDashboard() {
     try {
         // 1. Lancer le monitoring WebSocket
         initWebSockets();
 
-        // 2. Récupérer les conteneurs depuis l'API (Simulé pour l'instant)
-        // const containers = await fetchContainers(token);
-
-        // Simulation d'une liste vide/test en attendant la vraie API
-        const containersTest = [{ Names: ['/App_Test_1'] }, { Names: ['/Serveur_Minecraft'] }];
+        // 2. Récupérer les vrais conteneurs depuis l'API
+        const containers = await getContainers();
 
         // 3. Afficher la grille
-        renderContainersGrid(containersTest);
+        renderContainersGrid(containers);
 
     } catch (error) {
         console.error("Erreur lors de l'initialisation du tableau de bord :", error);

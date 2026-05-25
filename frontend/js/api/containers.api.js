@@ -24,3 +24,31 @@ export async function getContainers() {
     const data = await response.json();
     return data;
 }
+
+export async function actionContainer(id, action) {
+    const token = localStorage.getItem('dockflow_token');
+    
+    // Détermination de la méthode (DELETE pour la suppression, POST pour les autres)
+    const method = action === 'remove' ? 'DELETE' : 'POST';
+    
+    // Construction dynamique de l'URL (notre route DELETE est sur /:id, les autres sur /:id/:action)
+    const url = action === 'remove' ? `/api/containers/${id}` : `/api/containers/${id}/${action}`;
+
+    const response = await fetch(url, {
+        method: method,
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        if (response.status === 401) {
+            throw new Error("Session expirée");
+        }
+        // Tentative de récupération du message d'erreur du backend
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || `Erreur lors de l'action ${action}`);
+    }
+
+    return await response.json();
+}
