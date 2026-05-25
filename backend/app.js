@@ -10,6 +10,10 @@ app.get("/", (req, res) => {
 
 app.use(express.static(path.join(__dirname, "../frontend"), { index: false }));
 
+<<<<<<< HEAD
+app.get("/api/images", (req, res) => {
+    
+=======
 app.get("/api/containers", async (req, res) => {
     try {
         const containers = await listContainers();
@@ -20,6 +24,7 @@ app.get("/api/containers", async (req, res) => {
             error: "Erreur serveur"
         });
     }
+>>>>>>> faa1f350755457d5ad86e997f8eea9dda397f8c9
 });
 
 app.listen(PORT, '0.0.0.0', () => {
