@@ -1,5 +1,10 @@
 const { createOSUtils } = require('node-os-utils');
-const osUtils = createOSUtils();
+const osUtils = createOSUtils({
+    cpu: {
+        samplingInterval: 500, // temps de calcul du CPU (ms)
+        cacheTTL: 500          // durée du cache (ms)
+    }
+});
 
 async function getSystemStats() {
     try {

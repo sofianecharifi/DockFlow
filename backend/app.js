@@ -30,9 +30,9 @@ io.on('connection', (socket) => {
             console.error("Erreur stats:", err);
         }
 
-        // On attend 1 seconde avant de relancer pour éviter de surcharger l'Event Loop
-        // tout en gardant une interface fluide et réactive.
-        setTimeout(sendStats, 1000);
+        // On attend 500ms avant de relancer pour une interface plus réactive
+        // (Attention à ne pas mettre une valeur trop basse pour ne pas surcharger le serveur)
+        setTimeout(sendStats, 500);
     };
 
     sendStats();
