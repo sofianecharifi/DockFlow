@@ -41,6 +41,9 @@ let socket;
 
 // Initialisation de la connexion WebSockets
 function initWebSockets() {
+    // Ne pas recréer la connexion si elle existe déjà
+    if (socket) return;
+
     // Vérifie si Socket.io est bien chargé dans le HTML
     if (typeof io !== 'undefined') {
         socket = io(); // Connexion au serveur

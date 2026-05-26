@@ -15,28 +15,26 @@ const port = process.env.PORT || 3000;
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Gestion des connexions WebSocket
-io.on('connection', (socket) => {
-    // Envoi périodique des statistiques système
-    let isConnected = true;
-
-    const sendStats = async () => {
-        if (!isConnected) return;
-
+// Boucle globale d'envoi des statistiques système
+const broadcastStats = async () => {
+    // Ne calculer et n'envoyer les stats que si au moins un client est connecté
+    if (io.engine.clientsCount > 0) {
         try {
             const stats = await getSystemStats();
-            socket.emit('system-stats', stats);
+            io.emit('system-stats', stats);
         } catch (err) {
             console.error("Erreur stats:", err);
         }
+    }
+    // Intervalle de rafraîchissement des statistiques (1 seconde)
+    setTimeout(broadcastStats, 1000);
+};
 
-        // Intervalle de rafraîchissement des statistiques
-        // Note : Un délai trop court peut induire une surcharge CPU côté serveur
-        setTimeout(sendStats, 500);
-    };
+// Démarrer la boucle globale
+broadcastStats();
 
-    sendStats();
-
+// Gestion des connexions WebSocket
+io.on('connection', (socket) => {
     let logStream = null;
 
     // Initialisation du flux de logs Docker
@@ -82,7 +80,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        isConnected = false;
         if (logStream) {
             logStream.destroy();
             logStream = null;
