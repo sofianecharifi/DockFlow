@@ -8,15 +8,25 @@ const osUtils = createOSUtils({
 
 async function getSystemStats() {
     try {
-        // Collecte des données avec la nouvelle API
         const cpuResult = await osUtils.cpu.usage();
         const memResult = await osUtils.memory.info();
-        const diskResult = await osUtils.disk.info();
+        
+        let diskPercentage = 0;
+        try {
+            const fs = require('fs');
+            const path = require('path');
+            const rootDir = path.parse(process.cwd()).root;
+            const stats = await fs.promises.statfs(rootDir);
+            const used = stats.blocks - stats.bfree;
+            const totalForNonRoot = used + stats.bavail;
+            diskPercentage = (used / totalForNonRoot) * 100;
+            if (isNaN(diskPercentage)) diskPercentage = 0;
+        } catch (e) {
+            console.error("Erreur stats disque:", e);
+        }
 
         let cpuPercentage = 0;
         let ramPercentage = 0;
-        let diskPercentage = 0;
-
         if (cpuResult.success) {
             cpuPercentage = cpuResult.data;
         }
@@ -25,13 +35,7 @@ async function getSystemStats() {
             ramPercentage = memResult.data.usagePercentage || 0;
         }
 
-        if (diskResult.success && Array.isArray(diskResult.data)) {
-            // Trouver le disque principal ('/') ou prendre le premier
-            const mainDisk = diskResult.data.find(d => d.mountpoint === '/') || diskResult.data[0];
-            if (mainDisk) {
-                diskPercentage = mainDisk.usagePercentage || 0;
-            }
-        }
+
 
         // Formatage pour correspondre au frontend
         return {
