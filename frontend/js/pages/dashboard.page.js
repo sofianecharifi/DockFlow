@@ -36,11 +36,14 @@ function renderContainersGrid(containers) {
     });
 }
 
+// Variable globale pour le socket
+let socket;
+
 // Initialisation de la connexion WebSockets
 function initWebSockets() {
     // Vérifie si Socket.io est bien chargé dans le HTML
     if (typeof io !== 'undefined') {
-        const socket = io(); // Connexion au serveur
+        socket = io(); // Connexion au serveur
 
         // L'écouteur de stats
         socket.on('system-stats', (stats) => {
@@ -68,6 +71,39 @@ function initWebSockets() {
                 diskText.textContent = `${stats.disk}%`;
             }
         });
+
+        // Écoute des événements de logs en temps réel
+        socket.on('container-logs', (data) => {
+            const logsStream = document.getElementById('logs-stream');
+            
+            if (logsStream) {
+                // Si data est une simple chaîne (erreur système), on la formate
+                const text = typeof data === 'string' ? data : data.text;
+                const type = typeof data === 'string' ? 'stderr' : data.type;
+
+                const span = document.createElement('span');
+                span.textContent = text;
+                
+                // Coloration en fonction du type de log
+                if (type === 'stderr') {
+                    span.classList.add('text-red-400');
+                } else {
+                    span.classList.add('text-slate-200'); // Texte normal
+                }
+
+                logsStream.appendChild(span);
+                
+                // Limitation du buffer de logs pour prévenir la surcharge mémoire du navigateur
+                // On limite le nombre d'éléments enfants (environ 500)
+                while (logsStream.childNodes.length > 500) {
+                    logsStream.removeChild(logsStream.firstChild);
+                }
+
+                // Défilement automatique vers le dernier log reçu
+                const scrollContainer = logsStream.parentElement;
+                scrollContainer.scrollTop = scrollContainer.scrollHeight;
+            }
+        });
     } else {
         console.warn("Socket.io n'est pas encore inclus dans la page !");
     }
@@ -89,9 +125,13 @@ if (gridContainer) {
 
         if (!action || !id) return;
 
-        // On ignore le bouton logs pour le moment
+        // Gestion de l'affichage de la modale des logs
         if (action === 'logs') {
-            console.log("Ouverture des logs pour le conteneur", id);
+            const logsModal = document.getElementById('logs-modal');
+            if (logsModal && socket) {
+                logsModal.classList.remove('hidden');
+                socket.emit('request-logs', id);
+            }
             return;
         }
 
@@ -109,6 +149,33 @@ if (gridContainer) {
         }
     });
 }
+
+// Gestionnaires de fermeture de la modale de logs
+const closeLogsBtn = document.getElementById('close-logs-btn');
+
+function closeLogsModal() {
+    const logsModal = document.getElementById('logs-modal');
+    const logsStream = document.getElementById('logs-stream');
+
+    if (logsModal) {
+        logsModal.classList.add('hidden'); // Masquage de la modale
+    }
+    if (logsStream) {
+        logsStream.textContent = ''; // Réinitialisation du buffer textuel
+    }
+    if (socket) {
+        socket.emit('stop-logs'); // Signal d'arrêt du flux Docker vers le serveur
+    }
+}
+
+if (closeLogsBtn) closeLogsBtn.addEventListener('click', closeLogsModal);
+
+// Fermeture de la modale par clic sur l'arrière-plan
+const logsBackdrop = document.getElementById('logs-backdrop');
+if (logsBackdrop) {
+    logsBackdrop.addEventListener('click', closeLogsModal);
+}
+
 
 async function initializeDashboard() {
     try {

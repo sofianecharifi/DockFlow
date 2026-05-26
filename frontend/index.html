@@ -97,21 +97,24 @@
         <div id="logs-backdrop" class="absolute inset-0 bg-black/70 backdrop-blur-sm cursor-pointer"></div>
 
         <!-- Interface de type terminal pour les logs -->
-        <div
-            class="relative w-full max-w-4xl bg-black rounded-lg shadow-2xl border border-slate-700 overflow-hidden flex flex-col h-[70vh]">
+        <!-- Interface de type terminal pour les logs -->
+        <div class="relative w-full max-w-4xl bg-black rounded-lg shadow-2xl border border-slate-700 overflow-hidden flex flex-col h-[70vh]">
             <div class="bg-slate-800 px-4 py-3 border-b border-slate-700 flex justify-between items-center">
                 <span class="text-slate-300 font-mono text-sm">Terminal - Logs</span>
-                <button id="close-logs-btn" class="text-slate-400 hover:text-white transition-colors">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
+                
+                <div class="flex items-center gap-4">
+                    <button id="close-logs-btn" class="text-slate-400 hover:text-white transition-colors" title="Fermer">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
+
+            <!-- Zone d'affichage des logs -->
             <div class="p-4 flex-grow overflow-y-auto">
-                <pre id="logs-stream"
-                    class="text-green-400 font-mono text-xs sm:text-sm whitespace-pre-wrap break-all">Calcule...</pre>
+                <pre id="logs-stream" class="text-slate-200 font-mono text-xs sm:text-sm whitespace-pre-wrap break-all"></pre>
             </div>
         </div>
     </div>

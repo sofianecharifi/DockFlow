@@ -30,15 +30,63 @@ io.on('connection', (socket) => {
             console.error("Erreur stats:", err);
         }
 
-        // On attend 500ms avant de relancer pour une interface plus réactive
-        // (Attention à ne pas mettre une valeur trop basse pour ne pas surcharger le serveur)
+        // Intervalle de rafraîchissement des statistiques
+        // Note : Un délai trop court peut induire une surcharge CPU côté serveur
         setTimeout(sendStats, 500);
     };
 
     sendStats();
 
+    let logStream = null;
+
+    // Initialisation du flux de logs Docker
+
+    socket.on('request-logs', async (id) => {
+        if (logStream) {
+            logStream.destroy();
+            logStream = null;
+        }
+
+        try {
+            const container = docker.getContainer(id);
+            logStream = await container.logs({ stdout: true, stderr: true, follow: true, tail: 100 });
+            
+            // Utilisation de flux PassThrough pour nettoyer les en-têtes Docker
+            // et séparer la sortie standard des erreurs
+            const { PassThrough } = require('stream');
+            const stdoutPass = new PassThrough();
+            const stderrPass = new PassThrough();
+
+            stdoutPass.on('data', (chunk) => {
+                socket.emit('container-logs', { type: 'stdout', text: chunk.toString('utf8') });
+            });
+
+            stderrPass.on('data', (chunk) => {
+                socket.emit('container-logs', { type: 'stderr', text: chunk.toString('utf8') });
+            });
+
+            // Dé-multiplexage natif de dockerode
+            container.modem.demuxStream(logStream, stdoutPass, stderrPass);
+            
+        } catch (err) {
+            console.error("Erreur de récupération des logs:", err);
+            socket.emit('container-logs', `Erreur: ${err.message}`);
+        }
+    });
+
+    socket.on('stop-logs', () => {
+        if (logStream) {
+            logStream.destroy();
+            logStream = null;
+        }
+    });
+
     socket.on('disconnect', () => {
         isConnected = false;
+        if (logStream) {
+            logStream.destroy();
+            logStream = null;
+        }
     });
 });
 
