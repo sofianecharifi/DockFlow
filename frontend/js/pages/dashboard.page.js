@@ -78,7 +78,7 @@ function initWebSockets() {
         // Écoute des événements de logs en temps réel
         socket.on('container-logs', (data) => {
             const logsStream = document.getElementById('logs-stream');
-            
+
             if (logsStream) {
                 // Si data est une simple chaîne (erreur système), on la formate
                 const text = typeof data === 'string' ? data : data.text;
@@ -86,7 +86,7 @@ function initWebSockets() {
 
                 const span = document.createElement('span');
                 span.textContent = text;
-                
+
                 // Coloration en fonction du type de log
                 if (type === 'stderr') {
                     span.classList.add('text-red-400');
@@ -95,7 +95,7 @@ function initWebSockets() {
                 }
 
                 logsStream.appendChild(span);
-                
+
                 // Limitation du buffer de logs pour prévenir la surcharge mémoire du navigateur
                 // On limite le nombre d'éléments enfants (environ 500)
                 while (logsStream.childNodes.length > 500) {
@@ -114,6 +114,7 @@ function initWebSockets() {
 
 // Importation des services API
 import { getContainers, actionContainer } from '../api/containers.api.js';
+import { openLogsModal, initLogsModalEvents } from '../components/modal.js';
 
 // Gestion des événements d'action sur les conteneurs
 const gridContainer = document.getElementById('containers-grid');
@@ -130,11 +131,7 @@ if (gridContainer) {
 
         // Gestion de l'affichage de la modale des logs
         if (action === 'logs') {
-            const logsModal = document.getElementById('logs-modal');
-            if (logsModal && socket) {
-                logsModal.classList.remove('hidden');
-                socket.emit('request-logs', id);
-            }
+            openLogsModal(id, socket);
             return;
         }
 
@@ -142,7 +139,7 @@ if (gridContainer) {
             // Appel à l'API pour exécuter l'action
             button.disabled = true;
             await actionContainer(id, action);
-            
+
             // Rafraîchissement global de la page
             await initializeDashboard();
         } catch (error) {
@@ -153,31 +150,8 @@ if (gridContainer) {
     });
 }
 
-// Gestionnaires de fermeture de la modale de logs
-const closeLogsBtn = document.getElementById('close-logs-btn');
-
-function closeLogsModal() {
-    const logsModal = document.getElementById('logs-modal');
-    const logsStream = document.getElementById('logs-stream');
-
-    if (logsModal) {
-        logsModal.classList.add('hidden'); // Masquage de la modale
-    }
-    if (logsStream) {
-        logsStream.textContent = ''; // Réinitialisation du buffer textuel
-    }
-    if (socket) {
-        socket.emit('stop-logs'); // Signal d'arrêt du flux Docker vers le serveur
-    }
-}
-
-if (closeLogsBtn) closeLogsBtn.addEventListener('click', closeLogsModal);
-
-// Fermeture de la modale par clic sur l'arrière-plan
-const logsBackdrop = document.getElementById('logs-backdrop');
-if (logsBackdrop) {
-    logsBackdrop.addEventListener('click', closeLogsModal);
-}
+// Initialisation des événements pour la modale de logs
+initLogsModalEvents(() => socket);
 
 
 async function initializeDashboard() {
