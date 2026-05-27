@@ -4,7 +4,7 @@ const path = require('path');
 
 const dbPath = path.join(__dirname, '../../db/database.db');
 
-// connexion à la base
+// init db
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         return console.error('Erreur SQLite :', err.message);
@@ -49,10 +49,9 @@ db.allAsync = (sql, params = []) => {
     });
 };
 
-// création de la table + utilisateur de test
+// init tables & seed
 const initDb = async () => {
     try {
-        // création table users
         await db.runAsync(`
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -62,19 +61,17 @@ const initDb = async () => {
             )
         `);
 
-        // vérifier si le compte existe déjà
+        // check existing
         const row = await db.getAsync(`SELECT * FROM users WHERE email = ?`, ['admin@dockflow.io']);
 
-        // si utilisateur déjà existant
         if (row) {
             console.log('Compte test déjà existant');
             return;
         }
 
-        // hash du mot de passe
+        // hash pwd
         const hashedPassword = await bcrypt.hash('test1234', 10);
 
-        // insertion utilisateur
         await db.runAsync(
             `INSERT INTO users(email, password) VALUES(?, ?)`,
             ['admin@dockflow.io', hashedPassword]

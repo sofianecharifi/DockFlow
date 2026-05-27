@@ -1,7 +1,7 @@
-// Vérification de l'authentification de l'utilisateur
+// check auth
 const token = localStorage.getItem('dockflow_token');
 
-// Redirection vers la page de connexion si le token est manquant
+// pas de token -> redirect
 if (!token) {
     window.location.href = '/login.html';
 }
@@ -10,45 +10,35 @@ if (!token) {
 const logoutBtn = document.getElementById('logout-btn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-        // Suppression du token
         localStorage.removeItem('dockflow_token');
-        // Redirection vers le login
         window.location.href = '/login.html';
     });
 }
 
-// Fonctionnalités de rendu de la liste des conteneurs
 import { createContainerCard } from '../components/card.js';
 
 function renderContainersGrid(containers) {
-    // Récupération du conteneur de la grille
     const grid = document.getElementById('containers-grid');
     if (!grid) return;
 
-    // Nettoyage de la grille avant injection
+    // clear before inject
     grid.replaceChildren();
 
-    // Itération sur les conteneurs pour les afficher
     containers.forEach(container => {
-        // Création de l'élément carte du conteneur
         const cardElement = createContainerCard(container);
         grid.appendChild(cardElement);
     });
 }
 
-// Variable globale pour le socket
 let socket;
 
 // Initialisation de la connexion WebSockets
 function initWebSockets() {
-    // Ne pas recréer la connexion si elle existe déjà
     if (socket) return;
 
-    // Vérifie si Socket.io est bien chargé dans le HTML
     if (typeof io !== 'undefined') {
-        socket = io(); // Connexion au serveur
+        socket = io(); 
 
-        // L'écouteur de stats
         socket.on('system-stats', (stats) => {
             // CPU
             const cpuGauge = document.getElementById('cpu-gauge');
@@ -75,7 +65,6 @@ function initWebSockets() {
             }
         });
 
-        // Écoute des événements de logs en temps réel
         socket.on('container-logs', (data) => {
             const logsStream = document.getElementById('logs-stream');
 
@@ -156,13 +145,9 @@ initLogsModalEvents(() => socket);
 
 async function initializeDashboard() {
     try {
-        // 1. Lancer le monitoring WebSocket
+        // setup ws et fetch data
         initWebSockets();
-
-        // 2. Récupérer les vrais conteneurs depuis l'API
         const containers = await getContainers();
-
-        // 3. Afficher la grille
         renderContainersGrid(containers);
 
     } catch (error) {

@@ -11,13 +11,13 @@ const path = require("path");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Création du serveur HTTP et initialisation de Socket.io
+// init http & ws
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Boucle globale d'envoi des statistiques système
+// broadcast stats loop
 const broadcastStats = async () => {
-    // Ne calculer et n'envoyer les stats que si au moins un client est connecté
+    // limit to active clients
     if (io.engine.clientsCount > 0) {
         try {
             const stats = await getSystemStats();
@@ -26,18 +26,18 @@ const broadcastStats = async () => {
             console.error("Erreur stats:", err);
         }
     }
-    // Intervalle de rafraîchissement des statistiques (1 seconde)
+    // 1 sec refresh
     setTimeout(broadcastStats, 1000);
 };
 
-// Démarrer la boucle globale
+// start loop
 broadcastStats();
 
-// Gestion des connexions WebSocket
+// ws handlers
 io.on('connection', (socket) => {
     let logStream = null;
 
-    // Initialisation du flux de logs Docker
+    // setup logs
 
     socket.on('request-logs', async (id) => {
         if (logStream) {
@@ -49,8 +49,7 @@ io.on('connection', (socket) => {
             const container = docker.getContainer(id);
             logStream = await container.logs({ stdout: true, stderr: true, follow: true, tail: 100 });
             
-            // Utilisation de flux PassThrough pour nettoyer les en-têtes Docker
-            // et séparer la sortie standard des erreurs
+            // bypass headers and split streams
             const { PassThrough } = require('stream');
             const stdoutPass = new PassThrough();
             const stderrPass = new PassThrough();
@@ -63,7 +62,7 @@ io.on('connection', (socket) => {
                 socket.emit('container-logs', { type: 'stderr', text: chunk.toString('utf8') });
             });
 
-            // Dé-multiplexage natif de dockerode
+            // demux docker stream
             container.modem.demuxStream(logStream, stdoutPass, stderrPass);
             
         } catch (err) {
@@ -87,10 +86,10 @@ io.on('connection', (socket) => {
     });
 });
 
-// Middleware pour parser le JSON du body
+// body parser
 app.use(express.json());
 
-// Routes d'authentification
+// auth
 app.use('/api/auth', authRoutes);
 
 app.get("/", (req, res) => {
@@ -114,10 +113,10 @@ app.get("/api/images", (req, res) => {
     });
 });
 
-// Routes pour les conteneurs (protégées par requireAuth)
+// protected containers routes
 app.use('/api/containers', containersRoutes);
 
-// Lancement du serveur sur le port spécifié
+// boot
 server.listen(port, '0.0.0.0', () => {
     console.log(`Example app listening on port http://localhost:${port}`);
 });
