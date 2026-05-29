@@ -17,10 +17,10 @@ const requireAuth = (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         
 
-        req.user = decoded; // save decoded id
+        req.user = decoded; // save user id
         next();
     } catch (error) {
-        // catch invalid
+        // handle invalid token
         return res.status(401).json({ message: 'Non Autorisé' });
     }
 };

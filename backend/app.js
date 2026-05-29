@@ -98,25 +98,11 @@ app.get("/", (req, res) => {
 
 app.use(express.static(path.join(__dirname, "../frontend"), { index: false }));
 
-app.get("/api/images", (req, res) => {
-    docker.listImages({ all: true }, (err, images) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send("Error listing images");
-        } else {
-            const mappedImages = images.map((image) => ({
-                id: image.Id,
-                names: image.RepoTags,
-            }));
-            res.json(mappedImages);
-        }
-    });
-});
-
 // protected containers routes
 app.use('/api/containers', containersRoutes);
 
+
 // boot
 server.listen(port, '0.0.0.0', () => {
-    console.log(`Example app listening on port http://localhost:${port}`);
+    console.log(`DockFlow listening on port http://localhost:${port}`);
 });

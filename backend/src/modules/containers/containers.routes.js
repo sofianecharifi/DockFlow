@@ -3,7 +3,7 @@ const router = express.Router();
 const { listContainers, startContainer, stopContainer, restartContainer, removeContainer } = require('./containers.controller');
 const requireAuth = require('../../middlewares/requireAuth');
 
-// Route pour lister tous les conteneurs (protégée par requireAuth)
+// list all containers
 router.get('/', requireAuth, async (req, res) => {
     try {
         const containers = await listContainers();
@@ -13,7 +13,7 @@ router.get('/', requireAuth, async (req, res) => {
     }
 });
 
-// Actions sur un conteneur spécifique (toutes protégées par requireAuth)
+// container actions
 router.post('/:id/start', requireAuth, startContainer);
 router.post('/:id/stop', requireAuth, stopContainer);
 router.post('/:id/restart', requireAuth, restartContainer);

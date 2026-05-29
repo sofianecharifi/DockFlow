@@ -1,8 +1,8 @@
 const { createOSUtils } = require('node-os-utils');
 const osUtils = createOSUtils({
     cpu: {
-        samplingInterval: 500, // temps de calcul du CPU (ms)
-        cacheTTL: 500          // durée du cache (ms)
+        samplingInterval: 500, // cpu interval (ms)
+        cacheTTL: 500          // cache ttl (ms)
     }
 });
 
@@ -37,7 +37,7 @@ async function getSystemStats() {
 
 
 
-        // Formatage pour correspondre au frontend
+        // format for frontend
         return {
             cpu: Math.round(cpuPercentage),
             ram: Math.round(ramPercentage),
@@ -45,7 +45,7 @@ async function getSystemStats() {
         };
     } catch (error) {
         console.error("Erreur lors de la récupération des statistiques système :", error);
-        // Valeurs par défaut en cas d'erreur
+        // fallback values
         return { cpu: 0, ram: 0, disk: 0 };
     }
 }

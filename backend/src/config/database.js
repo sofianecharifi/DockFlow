@@ -61,26 +61,9 @@ const initDb = async () => {
             )
         `);
 
-        // check existing
-        const row = await db.getAsync(`SELECT * FROM users WHERE email = ?`, ['admin@dockflow.io']);
-
-        if (row) {
-            console.log('Compte test déjà existant');
-            return;
-        }
-
-        // hash pwd
-        const hashedPassword = await bcrypt.hash('test1234', 10);
-
-        await db.runAsync(
-            `INSERT INTO users(email, password) VALUES(?, ?)`,
-            ['admin@dockflow.io', hashedPassword]
-        );
-
-        console.log('Compte test créé');
 
     } catch (error) {
-        console.error('Erreur lors de l\'initialisation de la base de données :', error);
+        console.error('error initializing db', error);
     }
 };
 
