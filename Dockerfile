@@ -13,7 +13,6 @@ RUN npm install --build-from-source=sqlite3
 WORKDIR /app
 COPY backend/src ./backend/src
 COPY backend/app.js ./backend/app.js
-COPY backend/.env ./backend/.env
 COPY frontend ./frontend
 
 # Expose port
