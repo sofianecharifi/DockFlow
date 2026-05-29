@@ -1,9 +1,11 @@
+const API_BASE = window.Capacitor ? 'http://127.0.0.1:3000' : '';
+
 export async function getContainers() {
 
     const token = localStorage.getItem('dockflow_token');
 
 
-    const response = await fetch('/api/containers', {
+    const response = await fetch(`${API_BASE}/api/containers`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`
@@ -32,7 +34,7 @@ export async function actionContainer(id, action) {
     const method = action === 'remove' ? 'DELETE' : 'POST';
     
 
-    const url = action === 'remove' ? `/api/containers/${id}` : `/api/containers/${id}/${action}`;
+    const url = action === 'remove' ? `${API_BASE}/api/containers/${id}` : `${API_BASE}/api/containers/${id}/${action}`;
 
     const response = await fetch(url, {
         method: method,

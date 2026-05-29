@@ -1,5 +1,7 @@
+const API_BASE = window.Capacitor ? 'http://127.0.0.1:3000' : '';
+
 export async function loginRequest(email, password) {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

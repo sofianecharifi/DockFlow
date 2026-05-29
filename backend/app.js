@@ -7,13 +7,14 @@ const authRoutes = require("./src/modules/auth/auth.routes");
 const docker = require("./src/config/docker");
 const express = require("express");
 const path = require("path");
+const cors = require("cors");
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 // init http & ws
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, { cors: { origin: '*' } });
 
 // broadcast stats loop
 const broadcastStats = async () => {
@@ -87,6 +88,7 @@ io.on('connection', (socket) => {
 });
 
 // body parser
+app.use(cors());
 app.use(express.json());
 
 // auth

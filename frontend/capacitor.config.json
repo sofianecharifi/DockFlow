@@ -1,0 +1,8 @@
+{
+  "appId": "com.dockflow.app",
+  "appName": "DockFlow",
+  "webDir": "www",
+  "server": {
+    "cleartext": true
+  }
+}
