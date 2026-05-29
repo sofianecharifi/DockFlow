@@ -1,4 +1,4 @@
-const API_BASE = window.Capacitor ? 'http://127.0.0.1:3000' : '';
+const API_BASE = window.Capacitor ? 'http://100.94.198.32:3000' : 'http://100.94.198.32:3000';
 
 export async function loginRequest(email, password) {
     const response = await fetch(`${API_BASE}/api/auth/login`, {

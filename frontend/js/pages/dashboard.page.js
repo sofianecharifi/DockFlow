@@ -37,7 +37,7 @@ function initWebSockets() {
     if (socket) return;
 
     if (typeof io !== 'undefined') {
-        const API_BASE = window.Capacitor ? 'http://127.0.0.1:3000' : '';
+        const API_BASE = window.Capacitor ? 'http://100.94.198.32:3000' : 'http://100.94.198.32:3000';
         socket = io(API_BASE || undefined); 
 
         socket.on('system-stats', (stats) => {
