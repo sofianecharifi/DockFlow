@@ -1,4 +1,4 @@
-const API_BASE = window.Capacitor ? 'http://100.94.198.32:3000' : 'http://100.94.198.32:3000';
+const API_BASE = window.Capacitor ? 'http://IP_DE_TON_SERVEUR:3000' : '';
 
 export async function getContainers() {
 

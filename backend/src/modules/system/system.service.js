@@ -15,8 +15,9 @@ async function getSystemStats() {
         try {
             const fs = require('fs');
             const path = require('path');
-            const rootDir = path.parse(process.cwd()).root;
-            const stats = await fs.promises.statfs(rootDir);
+            // On vérifie si on a monté le disque de l'hôte dans /hostfs, sinon on prend la racine du conteneur
+            const checkPath = fs.existsSync('/hostfs') ? '/hostfs' : path.parse(process.cwd()).root;
+            const stats = await fs.promises.statfs(checkPath);
             const used = stats.blocks - stats.bfree;
             const totalForNonRoot = used + stats.bavail;
             diskPercentage = (used / totalForNonRoot) * 100;

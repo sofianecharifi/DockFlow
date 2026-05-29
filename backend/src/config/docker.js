@@ -1,8 +1,9 @@
 const Docker = require("dockerode");
 
+const isWindows = process.platform === "win32";
+
 const docker = new Docker({
-    // socketPath: "/var/run/docker.sock" // Linux
-    socketPath: "//./pipe/docker_engine" // Windows
+    socketPath: isWindows ? "//./pipe/docker_engine" : "/var/run/docker.sock"
 });
 
 module.exports = docker;
