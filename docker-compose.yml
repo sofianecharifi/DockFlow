@@ -6,6 +6,8 @@ services:
     container_name: dockflow_app
     ports:
       - "3000:3000"
+    env_file:
+      - ./backend/.env
     volumes:
       # Permet à l'application de communiquer avec le Docker de la machine hôte
       - /var/run/docker.sock:/var/run/docker.sock
