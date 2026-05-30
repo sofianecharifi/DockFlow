@@ -93,6 +93,14 @@ export function createContainerCard(container) {
     }
     actionsDiv.appendChild(logsBtn);
 
+    // pull btn
+    const pullBtn = document.createElement('button');
+    pullBtn.className = "col-span-2 mt-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 text-xs font-medium py-2 flex justify-center items-center gap-1 transition-colors rounded-lg";
+    pullBtn.textContent = "Pull l'image & Recréer";
+    pullBtn.dataset.action = 'pull';
+    pullBtn.dataset.id = container.id;
+    actionsDiv.appendChild(pullBtn);
+
     // delete btn
     const deleteBtn = document.createElement('button');
     deleteBtn.className = "col-span-2 mt-1 text-red-400 hover:text-red-300 text-xs font-medium py-2 flex justify-center items-center gap-1 transition-colors";

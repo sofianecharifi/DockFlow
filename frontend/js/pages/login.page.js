@@ -33,6 +33,9 @@ form.addEventListener('submit', async (e) => {
         
         // save token
         localStorage.setItem('dockflow_token', data.token);
+
+        emailInput.blur();
+        passwordInput.blur();
         
         // redirect
         window.location.href = '/index.html';
