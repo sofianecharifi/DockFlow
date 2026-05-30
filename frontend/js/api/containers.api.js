@@ -1,4 +1,4 @@
-const API_BASE = window.Capacitor ? 'http://IP_DE_TON_SERVEUR:3000' : '';
+const API_BASE = window.Capacitor ? 'https://dockflow.mycharifi.ovh' : '';
 
 export async function getContainers() {
 
